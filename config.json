@@ -1,0 +1,38 @@
+{
+  "resourceColor": {
+    "MS": "#d35365",
+    "P1": "#7b90a8",
+    "P2": "#7ba8a7"
+  },
+  "resourceName": {
+    "MS": "Main Stage",
+    "P1": "Panel Room 1",
+    "P2": "Panel Room 2"
+  },
+  "event_tags": [
+    ["recurring", "🔄Recurring"],
+    ["passive", "💤Passive"],
+    ["artist_specific", "🎨 Artist Specific"],
+    ["fursuiter_specific", "🐺 Fursuiter Specific"],
+    ["noise_warning", "🔊 Loud"],
+    ["lights_warning", "🔆 Flashing Lights"],
+    ["anxiety_warning", "😰 Anxiety Warning"],
+    ["nsfw", "🔞 NSFW"]
+  ],
+  "available_positions": [
+    "Light Technician",
+    "Video Technician",
+    "Mobile Camera",
+    "Audio Technician",
+    "Mic Wrangler",
+    "Paw 1",
+    "Paw 2",
+    "Paw 3",
+    "Paw 4"
+  ],
+  "crew_members": [
+    "Fufu",
+    "Nico",
+    "Zanec"
+  ]
+}

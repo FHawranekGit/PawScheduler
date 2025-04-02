@@ -4,7 +4,7 @@ from streamlit_calendar import calendar
 from pandas import DataFrame
 
 
-def get_calendar_events(events: DataFrame):
+def get_calendar_events(events: DataFrame, config: dict):
     calendar_events = []
     for index, event_series in events.iterrows():
         event_series.fillna("", inplace=True)
@@ -12,11 +12,12 @@ def get_calendar_events(events: DataFrame):
             "title": event_series["title"],
             "start": event_series["setup_start"],
             "end": event_series["teardown_end"],
-            "resourceId": "a",
-            "backgroundColor": "green",
-            "borderColor": "green"
+            "resourceId": event_series["room"],
+            "backgroundColor": config["resourceColor"][event_series["room"]],
+            "borderColor": config["resourceColor"][event_series["room"]]
         }
-        event_series.drop(["title", "setup_start", "teardown_end"], inplace=True)
+
+        event_series.drop(["title", "room", "setup_start", "teardown_end"], inplace=True)
         calendar_event.update(dict(event_series))
 
         if event_series["nsfw"]:
@@ -27,27 +28,25 @@ def get_calendar_events(events: DataFrame):
     return calendar_events
 
 
-def calendar_ui(events):
-    calendar_options = {
+calendar_options = {
         "editable": False,
         "navLinks": True,
         "initialView": "timeGridWeek",
         "resourceGroupField": "building",
         "resources": [
-            {"id": "a", "building": "Wimberger", "title": "Main Stage"},
-            {"id": "b", "building": "Wimberger", "title": "Panel Room 1"},
-            {"id": "c", "building": "Flemmings", "title": "Panel Room 2"}
+            {"id": "MS", "building": "Wimberger", "title": "Main Stage"},
+            {"id": "P1", "building": "Wimberger", "title": "Panel Room 1"},
+            {"id": "P2", "building": "Flemmings", "title": "Panel Room 2"}
         ],
         "selectable": "false",
         "headerToolbar": {
             "left": "today prev,next",
-            "center": "title",
-            "right": "timeGridDay,timeGridWeek,resourceTimeGridDay",
+            "right": "timeGridWeek,resourceTimeGridDay",
         },
     }
 
 
-
+def calendar_ui(events):
     calendar_events = [
         {
             "title": "Event 1",
@@ -74,7 +73,3 @@ def calendar_ui(events):
         if calendar_return["callback"] == "eventClick":
             event = calendar_return["eventClick"]["event"]
             return event
-
-
-ev = get_calendar_events(pd.read_excel("events.xlsx"))
-st.write(calendar_ui(ev))
