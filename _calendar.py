@@ -4,10 +4,19 @@ from streamlit_calendar import calendar
 from pandas import DataFrame
 
 
-def get_calendar_events(events: DataFrame, config: dict):
+def get_calendar_events(events: DataFrame, config: dict) -> list[dict]:
+    """
+    Convert a pd.DataFrame with events to a list with calendar events
+    :param events: Table with events in rows and event specific data in columns
+    :param config: Dict with room color and room notation
+    :return: list[dict]
+    """
     calendar_events = []
     for index, event_series in events.iterrows():
+        # iterate over every event
         event_series.fillna("", inplace=True)
+
+        # build event dict
         calendar_event = {
             "title": event_series["title"],
             "start": event_series["setup_start"],
@@ -17,10 +26,13 @@ def get_calendar_events(events: DataFrame, config: dict):
             "borderColor": config["resourceColor"][event_series["room"]]
         }
 
+        # delete already used information
+        # and append all other information for optional later use
         event_series.drop(["title", "room", "setup_start", "teardown_end"], inplace=True)
         calendar_event.update(dict(event_series))
 
         if event_series["nsfw"]:
+            # overwrite border Color if event is NSFW
             calendar_event["borderColor"] = "red"
 
         calendar_events.append(calendar_event)
@@ -28,6 +40,7 @@ def get_calendar_events(events: DataFrame, config: dict):
     return calendar_events
 
 
+# general settings of the calendar
 calendar_options = {
         "editable": False,
         "navLinks": True,
@@ -46,29 +59,20 @@ calendar_options = {
     }
 
 
-def calendar_ui(events):
-    calendar_events = [
-        {
-            "title": "Event 1",
-            "start": "2025-04-01T08:30:00",
-            "end": "2025-04-01T10:30:00",
-            "resourceId": "a",
-            "backgroundColor": "green",
-            "borderColor": "green"
-        },
-        {
-            "title": "Con",
-            "start": "2025-04-01",
-            "end": "2025-04-03",
-        }
-    ]
-
+def calendar_ui(events: list[dict]):
+    """
+    Shows an interactive streamlit calendar with the provided events
+    :param events: streamlit-calendar compatible list of event dicts
+    :return: selected event data (None if no selection)
+    """
+    # show calendar
     calendar_return = calendar(
         events=events,
         options=calendar_options,
         key='calendar'
         )
 
+    # filter event selection returns
     if "callback" in calendar_return:
         if calendar_return["callback"] == "eventClick":
             event = calendar_return["eventClick"]["event"]
