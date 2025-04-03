@@ -44,7 +44,13 @@ def update_event_table():
 
 
 # website title
-st.title("Paw Scheduler")
+st.markdown('# <font color="#FFFFFF">Paw</font><font color="#d35365">Scheduler</font>', unsafe_allow_html=True)
+
+if not ss.config["editable"]:
+    # schedule has been locked
+    st.badge("Locked", icon="⛔️", color="primary")
+
+st.write(ss.event_table)
 
 # start periodic updates of event table
 update_event_table()
@@ -113,8 +119,13 @@ else:
                 # interactive dropdown menu
                 col_config[position] = st.column_config.SelectboxColumn(
                     position,
-                    options=ss.config["crew_members"]  # list of crew members
+                    options=ss.config["crew_members"],  # list of crew members
+                    disabled=not ss.config["editable"]  # locks table if set in config
                 )
+
+        if not ss.config["editable"]:
+            # schedule has been locked
+            st.badge("Locked", icon="⛔️", color="primary")
 
         # build dataframe
         crew_positions = pd.DataFrame(
