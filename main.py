@@ -209,9 +209,6 @@ def show_interactive_position_selections_col(sel_event: pd.Series, sel_event_ind
                " (:material/fullscreen: in top right corner of the table)")
     st.caption('Click on "None" or an already filled in name to edit it.')
 
-    print(new_crew_positions)
-    print("\n")
-
     # write to the event table and save as file
     save_to_event_table(new_crew_positions, sel_event_index)
 
