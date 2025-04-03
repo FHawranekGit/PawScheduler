@@ -133,15 +133,11 @@ else:
                    " (:material/fullscreen: in top right corner of the table)")
         st.caption('Click on "None" or an already filled in name to edit it.')
 
-        if not crew_positions.equals(new_crew_positions):
-            # crew positions were edited
-            # write to the event table and save as file
-            update_event_table()
-            ss.event_table.replace(np.nan, "$unassignedcrewpositions$", inplace=True)  # replace NaN with string
-            replacement_data = new_crew_positions.iloc[0].tolist()
-            ss.event_table.loc[selected_event_index, positions] = replacement_data
-            ss.event_table.replace("$unassignedcrewpositions$", np.nan, inplace=True)  # place Nan back
-            ss.event_table.to_excel("events.xlsx", index=False)
+        # write to the event table and save as file
+        update_event_table()  # reload recent event table
+        replacement_data = new_crew_positions.iloc[0].tolist()  # format positions as list
+        ss.event_table.loc[selected_event_index, positions] = replacement_data  # merge into event table
+        ss.event_table.to_excel("events.xlsx", index=False)  # save to file
 
     # ### SETUP ###
     st.subheader("Setup", divider="grey")
