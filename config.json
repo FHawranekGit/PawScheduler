@@ -11,14 +11,14 @@
     "P2": "Panel Room 2"
   },
   "event_tags": [
-    ["recurring", "🔄Recurring"],
-    ["passive", "💤Passive"],
-    ["artist_specific", "🎨 Artist Specific"],
-    ["fursuiter_specific", "🐺 Fursuiter Specific"],
-    ["noise_warning", "🔊 Loud"],
-    ["lights_warning", "🔆 Flashing Lights"],
-    ["anxiety_warning", "😰 Anxiety Warning"],
-    ["nsfw", "🔞 NSFW"]
+    ["recurring", ":arrows_counterclockwise: Recurring"],
+    ["passive", ":zzz: Passive"],
+    ["artist_specific", ":art: Artist Specific"],
+    ["fursuiter_specific", ":wolf: Fursuiter Specific"],
+    ["noise_warning", ":sound: Loud"],
+    ["lights_warning", ":high_brightness: Flashing Lights"],
+    ["anxiety_warning", ":cold_sweat: Anxiety Warning"],
+    ["nsfw", ":underage: NSFW"]
   ],
   "available_positions": [
     "Light Technician",
