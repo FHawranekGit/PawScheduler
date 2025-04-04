@@ -101,7 +101,7 @@ def show_event_header(event: pd.Series, short: bool = False) -> None:
     if short:
         # display two line form
         room_name = ss.config["resourceName"][event.room]
-        if event.subtitle:
+        if event.subtitle is not np.nan:
             # show subtitle if available
             second_line_text = (f'{event.subtitle} <font color="#a3a3a4">by {event.host} '
                                 f'({event.contact}) at {room_name}</font>')
@@ -110,7 +110,7 @@ def show_event_header(event: pd.Series, short: bool = False) -> None:
         st.markdown(second_line_text, unsafe_allow_html=True)
     else:
         # display three line form
-        if event.subtitle:
+        if event.subtitle is not np.nan:
             # show subtitle if available
             st.subheader(event.subtitle)
 
@@ -241,14 +241,20 @@ def show_setup_info(event: pd.Series) -> None:
     with required_eq_col:
         # show required equipment
         st.markdown("##### Required Equipment:")
-        equipment = event.required_equipment.replace(", ", "\n* ")
-        st.markdown(f"* {equipment}")
+        if event.required_equipment is not np.nan:
+            equipment = event.required_equipment.replace(", ", "\n* ")
+            st.markdown(f"* {equipment}")
+        else:
+            st.text("nan")
 
     with private_eq_col:
         # show private equipment
         st.markdown("##### Private Equipment:")
-        equipment = event.private_equipment.replace(", ", "\n* ")
-        st.markdown(f"* {equipment}")
+        if event.private_equipment is not np.nan:
+            equipment = event.private_equipment.replace(", ", "\n* ")
+            st.markdown(f"* {equipment}")
+        else:
+            st.text("nan")
 
 
 def build_tags_string(event: pd.Series) -> str:
@@ -343,8 +349,24 @@ def show_calendar_tab() -> None:
         show_general_event_info(selected_event)
 
 
-def show_open_shifts_event_cell(event: pd.Series, num_of_open_positions: int, expand_all: bool):
-    with st.expander(f"[{num_of_open_positions}] - {event.title}", expanded=expand_all):
+def show_open_shifts_event_cell(event: pd.Series, show_open_positions: bool, expanded: bool,
+                                num_of_open_positions: int = None) -> None:
+    """
+    Shows a single event block (cell) in an expander with short information about the event, timetable
+    and shifts for this event (not editable)
+    :param event: event as pd.Series
+    :param show_open_positions: shows number of open positions in label if True
+    :param expanded: initial state of the expander as bool, True equals expanded
+    :param num_of_open_positions: the nuber of open positions for this event as int,
+        required if show_open_positions is set to True
+    :return: None
+    """
+    if show_open_positions:
+        label = f"[{num_of_open_positions}] - {event.title}"
+    else:
+        label = event.title
+
+    with st.expander(label, expanded=expanded):
         # event title
         show_event_header(event, short=True)
 
@@ -378,7 +400,26 @@ def show_open_shifts_event_cell(event: pd.Series, num_of_open_positions: int, ex
             st.caption("Switch to calendar view to edit")
 
 
+def show_weekday_name(event: pd.Series, last_printed_day) -> str:
+    """
+    Shows the weekday name of the setup start time of this event if it's different from the last printed day
+    :param event: event as pd.Series
+    :param last_printed_day: weekday name of the last printed day
+    :return: weekday name of the setup start time of this event
+    """
+    weekday_name = datetime.strptime(event.setup_start, "%Y-%m-%dT%H:%M:%S").strftime("%A")
+    if weekday_name != last_printed_day:
+        st.subheader(weekday_name, divider="gray")
+        last_printed_day = weekday_name
+
+    return last_printed_day
+
+
 def show_open_shifts_tab() -> None:
+    """
+    Shows the site with a list of all events with open shifts
+    :return: None
+    """
     refresh_warning_col, _, expander_settings = st.columns([2, 2, 1])
     with refresh_warning_col:
         # warn user that this list won't update automatically
@@ -392,6 +433,7 @@ def show_open_shifts_tab() -> None:
 
     sorted_event_table = ss.event_table.sort_values(by="setup_start")
 
+    last_printed_day = ""
     for event_index, event in sorted_event_table.iterrows():
         open_positions = event.isin([np.nan])
         has_open_positions = np.any(open_positions)
@@ -401,11 +443,74 @@ def show_open_shifts_tab() -> None:
             # scip event if there are no open positions
             continue
 
-        show_open_shifts_event_cell(event, int(num_of_open_positions), expand_all)
+        # show weekday name for every new day
+        last_printed_day = show_weekday_name(event, last_printed_day)
+
+        show_open_shifts_event_cell(
+            event,
+            True,
+            expand_all,
+            num_of_open_positions=int(num_of_open_positions)
+        )
 
 
 def show_your_shifts_tab() -> None:
-    st.info("Coming soon...")
+    selected_crew_members = st.multiselect(
+        label="Shown Crew Member",
+        options=ss.config["crew_members"],
+        placeholder="Select your name",
+        label_visibility="collapsed"
+    )
+
+    if len(selected_crew_members) <= 1:
+        st.caption("You can select multiple names to show common shifts")
+
+    st.divider()
+
+    if not selected_crew_members:
+        # selection is empty, end tab
+        st.info("No names selected")
+        return
+
+    # sort event table by setup start time
+    sorted_event_table = ss.event_table.sort_values(by="setup_start")
+
+    # get all available positions
+    positions = ss.config["available_positions"]
+
+    # search all events
+    found_events = []
+    for event_index, event in sorted_event_table.iterrows():
+        all_names_found = True
+        for name in selected_crew_members:
+            # check if name is in event's positions
+            if not np.any(event[positions].isin([name])):
+                all_names_found = False
+
+        if all_names_found:
+            # event is a match -> append to result list
+            found_events.append(event)
+
+    if not found_events:
+        # no matching events found, end tab
+        st.warning("No events found that match with your search query")
+        return
+
+    # iterate through found events
+    last_printed_day = ""
+    for event in found_events:
+        # show weekday name for every new day
+        last_printed_day = show_weekday_name(event, last_printed_day)
+
+        # show event cell
+        show_open_shifts_event_cell(event, False, False)
+
+
+def show_all_data_tab() -> None:
+    # sort event table by setup start time
+    sorted_event_table = ss.event_table.sort_values(by="setup_start")
+
+    st.dataframe(sorted_event_table)
 
 
 # set page icon to paws
@@ -423,6 +528,8 @@ if "config" not in ss:
         ss.config = json.load(fh)
 
 
+st.logo("Logo-1-Color-B.png", size="large", link="https://awoostria.at/")
+
 # website title
 st.markdown('# <font color="#FFFFFF">Paw</font><font color="#d35365">Scheduler</font>', unsafe_allow_html=True)
 
@@ -431,7 +538,14 @@ show_locked_badge()
 # start periodic updates of event table
 update_event_table()
 
-calendar_tab, open_shifts_tab, your_shifts_tab = st.tabs(["Calendar", "Open Shifts", "Your Shifts"])
+calendar_tab, open_shifts_tab, your_shifts_tab, all_data_tab = st.tabs(
+    [
+        "Calendar",
+        "Open Shifts",
+        "Your Shifts",
+        "Hit me with all data"
+    ]
+)
 
 with calendar_tab:
     show_calendar_tab()
@@ -441,3 +555,6 @@ with open_shifts_tab:
 
 with your_shifts_tab:
     show_your_shifts_tab()
+
+with all_data_tab:
+    show_all_data_tab()
