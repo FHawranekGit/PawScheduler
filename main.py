@@ -98,15 +98,24 @@ def show_event_header(event: pd.Series, short: bool = False) -> None:
     """
     st.header(event.title)
 
+    contacts = []
+    for contact in event.contact.split(", "):
+        if contact[0] == "@":
+            # is Telegram username
+            contacts.append(f"[{contact}](https://t.me/{contact[1:]})")
+        else:
+            contacts.append(contact)
+    formated_contact_info = ", ".join(contacts)
+
     if short:
         # display two line form
         room_name = ss.config["resourceName"][event.room]
         if event.subtitle is not np.nan:
             # show subtitle if available
             second_line_text = (f'{event.subtitle} <font color="#a3a3a4">by {event.host} '
-                                f'({event.contact}) at {room_name}</font>')
+                                f'({formated_contact_info}) at {room_name}</font>')
         else:
-            second_line_text = f'<font color="#a3a3a4">by {event.host} ({event.contact}) at {room_name} </font>'
+            second_line_text = f'<font color="#a3a3a4">by {event.host} ({formated_contact_info}) at {room_name} </font>'
         st.markdown(second_line_text, unsafe_allow_html=True)
     else:
         # display three line form
@@ -115,7 +124,7 @@ def show_event_header(event: pd.Series, short: bool = False) -> None:
             st.subheader(event.subtitle)
 
         room_name = ss.config["resourceName"][event.room]
-        st.caption(f"by {event.host} ({event.contact}) at {room_name}")
+        st.caption(f"by {event.host} ({formated_contact_info}) at {room_name}")
 
 
 def show_timetable(event: pd.Series) -> None:
