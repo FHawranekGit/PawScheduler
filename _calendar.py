@@ -12,26 +12,26 @@ def get_calendar_events(events: DataFrame, config: dict) -> list[dict]:
     :return: list[dict]
     """
     calendar_events = []
-    for index, event_series in events.iterrows():
+    for index, event in events.iterrows():
         # iterate over every event
-        event_series.fillna("", inplace=True)
+        event.fillna("", inplace=True)
 
         # build event dict
         calendar_event = {
-            "title": event_series["title"],
-            "start": event_series["setup_start"],
-            "end": event_series["teardown_end"],
-            "resourceId": event_series["room"],
-            "backgroundColor": config["resourceColor"][event_series["room"]],
-            "borderColor": config["resourceColor"][event_series["room"]]
+            "title": event.title,
+            "start": event.setup_start,
+            "end": event.teardown_end,
+            "resourceId": event.room,
+            "backgroundColor": config["resourceColor"][event.room],
+            "borderColor": config["resourceColor"][event.room]
         }
 
         # delete already used information
         # and append all other information for optional later use
-        event_series.drop(["title", "room", "setup_start", "teardown_end"], inplace=True)
-        calendar_event.update(dict(event_series))
+        event.drop(["title", "room", "setup_start", "teardown_end"], inplace=True)
+        calendar_event.update(dict(event))
 
-        if event_series["nsfw"]:
+        if event.nsfw:
             # overwrite border Color if event is NSFW
             calendar_event["borderColor"] = "red"
 
@@ -40,29 +40,11 @@ def get_calendar_events(events: DataFrame, config: dict) -> list[dict]:
     return calendar_events
 
 
-# general settings of the calendar
-calendar_options = {
-        "editable": False,
-        "navLinks": True,
-        "initialView": "timeGridWeek",
-        "resourceGroupField": "building",
-        "resources": [
-            {"id": "MS", "building": "Wimberger", "title": "Main Stage"},
-            {"id": "P1", "building": "Wimberger", "title": "Panel Room 1"},
-            {"id": "P2", "building": "Flemmings", "title": "Panel Room 2"}
-        ],
-        "selectable": "false",
-        "headerToolbar": {
-            "left": "today prev,next",
-            "right": "timeGridWeek,resourceTimeGridDay",
-        },
-    }
-
-
-def calendar_ui(events: list[dict]):
+def calendar_ui(events: list[dict], calendar_options: dict):
     """
     Shows an interactive streamlit calendar with the provided events
     :param events: streamlit-calendar compatible list of event dicts
+    :param calendar_options: streamlit-calendar compatible dict with all options
     :return: selected event data (None if no selection)
     """
     # show calendar

@@ -67,7 +67,7 @@ def show_calendar() -> dict:
     :return: selected calendar event as dict
     """
     events = get_calendar_events(ss.event_table, ss.config)
-    selection = calendar_ui(events)
+    selection = calendar_ui(events, ss.config["calendarOptions"])
 
     cal_capt_col1, _, cal_capt_col2 = st.columns([4, 1, 3])
 
@@ -85,7 +85,7 @@ def get_selected_event_series() -> tuple[pd.Series, int]:
     Returns a pandas series from the selected event title in session state
     :return: tuple of (selected event as pandas series, index of selected event)
     """
-    sel_event_index = ss.event_table.index[ss.event_table["title"] == ss.selected_event_title].tolist()[0]
+    sel_event_index = ss.event_table.index[ss.event_table.title == ss.selected_event_title].tolist()[0]
     return ss.event_table.iloc[sel_event_index], sel_event_index
 
 
@@ -217,9 +217,9 @@ def show_interactive_position_selections_col(event: pd.Series, event_index: int)
         column_config=col_config,
         hide_index=True
     )
-    st.caption("Don't forget to scroll to the right or switch to fullscreen"
+    st.caption("Don't forget to scroll to the right or switch to fullscreen  \n"
                " (:material/fullscreen: in top right corner of the table)")
-    st.caption('Click on "None" or an already filled in name to edit it.')
+    st.caption('Click on _None_ or an already filled in name to edit it.')
 
     # write to the event table and save as file
     save_to_event_table(new_crew_positions, event_index)
@@ -516,16 +516,20 @@ def show_all_data_tab() -> None:
 # set page icon to paws
 st.set_page_config(page_icon="🐾")
 
-#query_lock("awoo", "2025", "Forbidden")
-
-# load event table for the first time
-if "event_table" not in ss:
-    ss.event_table = pd.read_excel("events.xlsx")
 
 # load config for the first time
 if "config" not in ss:
     with open("config.json", "rt") as fh:
         ss.config = json.load(fh)
+
+if ss.config["query_lock"]:
+    # limit access if defined in config
+    for query_key, value in ss.config["query_lock"].items():
+        query_lock(query_key, value, "Forbidden")
+
+# load event table for the first time
+if "event_table" not in ss:
+    ss.event_table = pd.read_excel("events.xlsx")
 
 
 st.logo("Logo-1-Color-B.png", size="large", link="https://awoostria.at/")

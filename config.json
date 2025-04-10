@@ -1,15 +1,33 @@
 {
   "editable": true,
+  "query_lock": {},
   "resourceColor": {
-    "MS": "#d35365",
-    "P1": "#7b90a8",
-    "P2": "#7ba8a7"
+    "MS": "#3C5172",
+    "P1": "#458267",
+    "P2": "#44807E"
   },
   "resourceName": {
     "MS": "Main Stage",
     "P1": "Panel Room 1",
     "P2": "Panel Room 2"
   },
+  "calendarOptions": {
+        "editable": "false",
+        "navLinks": "true",
+        "initialView": "timeGridWeek",
+        "resourceGroupField": "building",
+        "resources": [
+            {"id": "MS", "building": "Wimberger", "title": "Main Stage"},
+            {"id": "P1", "building": "Wimberger", "title": "Panel Room 1"},
+            {"id": "P2", "building": "Flemings", "title": "Panel Room 2"}
+        ],
+        "selectable": "false",
+        "headerToolbar": {
+            "left": "today prev,next",
+            "right": "timeGridWeek,resourceTimeGridDay"
+        },
+        "initialDate": "2025-04-01"
+    },
   "event_tags": [
     ["recurring", ":arrows_counterclockwise: Recurring"],
     ["passive", ":zzz: Passive"],
