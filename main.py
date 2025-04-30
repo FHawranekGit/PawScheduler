@@ -444,7 +444,10 @@ def show_open_shifts_tab() -> None:
 
     last_printed_day = ""
     for event_index, event in sorted_event_table.iterrows():
-        open_positions = event.isin([np.nan])
+        event_positions = event[ss.config["available_positions"]]
+
+        # get open positions of the event
+        open_positions = event_positions.isin([np.nan])
         has_open_positions = np.any(open_positions)
         num_of_open_positions = np.sum(open_positions)
 
