@@ -429,7 +429,7 @@ def show_open_shifts_tab() -> None:
     Shows the site with a list of all events with open shifts
     :return: None
     """
-    refresh_warning_col, _, expander_settings = st.columns([2, 2, 1])
+    refresh_warning_col, filled_positions_meter, expander_settings = st.columns([2, 2, 1])
     with refresh_warning_col:
         # warn user that this list won't update automatically
         with st.expander(":primary[Refresh - Info]"):
@@ -442,6 +442,9 @@ def show_open_shifts_tab() -> None:
 
     sorted_event_table = ss.event_table.sort_values(by="setup_start")
 
+    # iterate through events
+    total_open_positions = 0
+    total_existing_positions = 0
     last_printed_day = ""
     for event_index, event in sorted_event_table.iterrows():
         event_positions = event[ss.config["available_positions"]]
@@ -450,6 +453,14 @@ def show_open_shifts_tab() -> None:
         open_positions = event_positions.isin([np.nan])
         has_open_positions = np.any(open_positions)
         num_of_open_positions = np.sum(open_positions)
+
+        # get over all positions of the event
+        existing_positions = event_positions.isin([np.nan] + ss.config["crew_members"])
+        num_of_existing_positions = np.sum(existing_positions)
+
+        # count open and general positions of all events
+        total_open_positions += num_of_open_positions
+        total_existing_positions += num_of_existing_positions
 
         if not has_open_positions:
             # scip event if there are no open positions
@@ -464,6 +475,10 @@ def show_open_shifts_tab() -> None:
             expand_all,
             num_of_open_positions=int(num_of_open_positions)
         )
+
+    with filled_positions_meter:
+        rel_filled_positions = (1 - total_open_positions/total_existing_positions) * 100
+        st.metric("Filled Positions", f"{rel_filled_positions:.0f} %")
 
 
 def show_your_shifts_tab() -> None:
