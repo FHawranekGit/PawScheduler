@@ -99,13 +99,16 @@ def show_event_header(event: pd.Series, short: bool = False) -> None:
     st.header(event.title)
 
     contacts = []
-    for contact in event.contact.split(", "):
-        if contact[0] == "@":
-            # is Telegram username
-            contacts.append(f"[{contact}](https://t.me/{contact[1:]})")
-        else:
-            contacts.append(contact)
-    formated_contact_info = ", ".join(contacts)
+    if event.contact is not np.nan:
+        for contact in event.contact.split(", "):
+            if contact[0] == "@":
+                # is Telegram username
+                contacts.append(f"[{contact}](https://t.me/{contact[1:]})")
+            else:
+                contacts.append(contact)
+        formated_contact_info = ", ".join(contacts)
+    else:
+        formated_contact_info = "no contact"
 
     if short:
         # display two line form
