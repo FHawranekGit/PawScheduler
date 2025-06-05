@@ -2,15 +2,15 @@
   "editable": true,
   "query_lock": {},
   "resourceColor": {
-    "AA": "#FFFFFF",
-    "PRS": "#FFFFFF",
-    "PRM": "#FFFFFF",
-    "BAR": "#FFFFFF",
-    "MS": "#3C5172",
-    "CR": "#FFFFFF",
-    "LOB": "#FFFFFF",
-    "NAN": "#FFFFFF",
-    "MPR": "#FFFFFF"
+    "AA": "#749C75",
+    "PRS": "#396272",
+    "PRM": "#254E70",
+    "BAR": "#9F6081",
+    "MS": "#70252F",
+    "CR": "#4D7573",
+    "LOB": "#9D4D65",
+    "NAN": "#060606",
+    "MPR": "#87394A"
   },
   "resourceName": {
     "AA": "Artist Alley",
@@ -23,21 +23,32 @@
     "NAN": "Not Active",
     "MPR": "Multi-purpose Room"
   },
+  "resourceOrder": {
+    "AA": 5,
+    "PRS": 7,
+    "PRM": 8,
+    "BAR": 4,
+    "MS": 1,
+    "CR": 6,
+    "LOB": 3,
+    "NAN": 9,
+    "MPR": 2
+  },
   "calendarOptions": {
         "editable": "false",
         "navLinks": "true",
         "initialView": "timeGridWeek",
         "resourceGroupField": "building",
         "resources": [
-            {"id": "AA", "building": "Flemings", "title": "Artist Alley"},
-            {"id": "PRS", "building": "Flemings", "title": "Panel Room S"},
-            {"id": "PRM", "building": "Flemings", "title": "Panel Room M"},
-            {"id": "BAR", "building": "Wimberger", "title": "Bar"},
-            {"id": "MS", "building": "Wimberger", "title": "Main Stage"},
-            {"id": "CR", "building": "Flemings", "title": "Community Room"},
-            {"id": "LOB", "building": "Wimberger", "title": "Lobby"},
-            {"id": "NAN", "building": "None", "title": "Not Active"},
-            {"id": "MPR", "building": "Wimberger", "title": "Multi-purpose Room"}
+            {"id": "5AA", "building": "Flemings", "title": "Artist Alley"},
+            {"id": "7PRS", "building": "Flemings", "title": "Panel Room S"},
+            {"id": "8PRM", "building": "Flemings", "title": "Panel Room M"},
+            {"id": "4BAR", "building": "Wimberger", "title": "Bar"},
+            {"id": "1MS", "building": "Wimberger", "title": "Main Stage"},
+            {"id": "6CR", "building": "Flemings", "title": "Comm. Room"},
+            {"id": "3LOB", "building": "Wimberger", "title": "Lobby"},
+            {"id": "9NAN", "building": "None", "title": "Not Active"},
+            {"id": "2MPR", "building": "Wimberger", "title": "Multi-purpose Room"}
         ],
         "selectable": "false",
         "headerToolbar": {

@@ -11,15 +11,20 @@
     "P1": "Panel Room 1",
     "P2": "Panel Room 2"
   },
+  "resourceOrder": {
+    "MS": 1,
+    "P1": 2,
+    "P2": 3
+  },
   "calendarOptions": {
         "editable": "false",
         "navLinks": "true",
         "initialView": "timeGridWeek",
         "resourceGroupField": "building",
         "resources": [
-            {"id": "MS", "building": "Wimberger", "title": "Main Stage"},
-            {"id": "P1", "building": "Wimberger", "title": "Panel Room 1"},
-            {"id": "P2", "building": "Flemings", "title": "Panel Room 2"}
+            {"id": "1MS", "building": "Wimberger", "title": "Main Stage"},
+            {"id": "2P1", "building": "Wimberger", "title": "Panel Room 1"},
+            {"id": "3P2", "building": "Flemings", "title": "Panel Room 2"}
         ],
         "selectable": "false",
         "headerToolbar": {

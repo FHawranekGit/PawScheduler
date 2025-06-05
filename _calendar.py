@@ -21,7 +21,7 @@ def get_calendar_events(events: DataFrame, config: dict) -> list[dict]:
             "title": event.title,
             "start": event.setup_start,
             "end": event.teardown_end,
-            "resourceId": event.room,
+            "resourceId": str(config["resourceOrder"][event.room]) + event.room,
             "backgroundColor": config["resourceColor"][event.room],
             "borderColor": config["resourceColor"][event.room]
         }
