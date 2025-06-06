@@ -37,7 +37,14 @@
   "calendarOptions": {
         "editable": false,
         "navLinks": true,
-        "initialView": "timeGridWeek",
+        "initialView": "timeGridFourDay",
+        "views": {
+        "timeGridFourDay": {
+            "type": "timeGrid",
+            "duration": { "days": 5 },
+            "buttonText": "whole con"
+        }
+  },
         "resourceGroupField": "building",
         "resources": [
             {"id": "5AA", "building": "Flemings", "title": "Artist Alley"},
@@ -53,9 +60,10 @@
         "selectable": false,
         "headerToolbar": {
             "left": "today prev,next",
-            "right": "timeGridWeek,resourceTimeGridDay"
+            "center": "title",
+            "right": "timeGridFourDay,resourceTimeGridDay"
         },
-        "initialDate": "2025-07-23"
+        "initialDate": "2025-07-24"
     },
   "event_tags": [
     ["recurring", ":arrows_counterclockwise: Recurring"],
