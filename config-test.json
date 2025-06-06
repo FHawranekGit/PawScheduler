@@ -17,8 +17,8 @@
     "P2": 3
   },
   "calendarOptions": {
-        "editable": "false",
-        "navLinks": "true",
+        "editable": false,
+        "navLinks": true,
         "initialView": "timeGridWeek",
         "resourceGroupField": "building",
         "resources": [
@@ -26,7 +26,7 @@
             {"id": "2P1", "building": "Wimberger", "title": "Panel Room 1"},
             {"id": "3P2", "building": "Flemings", "title": "Panel Room 2"}
         ],
-        "selectable": "false",
+        "selectable": false,
         "headerToolbar": {
             "left": "today prev,next",
             "right": "timeGridWeek,resourceTimeGridDay"

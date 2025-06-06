@@ -35,8 +35,8 @@
     "MPR": 2
   },
   "calendarOptions": {
-        "editable": "false",
-        "navLinks": "true",
+        "editable": false,
+        "navLinks": true,
         "initialView": "timeGridWeek",
         "resourceGroupField": "building",
         "resources": [
@@ -50,7 +50,7 @@
             {"id": "9NAN", "building": "None", "title": "Not Active"},
             {"id": "2MPR", "building": "Wimberger", "title": "Multi-purpose Room"}
         ],
-        "selectable": "false",
+        "selectable": false,
         "headerToolbar": {
             "left": "today prev,next",
             "right": "timeGridWeek,resourceTimeGridDay"
