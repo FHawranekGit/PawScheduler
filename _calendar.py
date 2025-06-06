@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import streamlit as st
 from streamlit_calendar import calendar
 from pandas import DataFrame
@@ -34,6 +35,13 @@ def get_calendar_events(events: DataFrame, config: dict) -> list[dict]:
         if event.nsfw:
             # overwrite border Color if event is NSFW
             calendar_event["borderColor"] = "red"
+
+        # check if event requires personal
+        event_positions = event[config["available_positions"]]
+        not_required_positions = event_positions.isin(["-"])
+        if np.all(not_required_positions):
+            # overwrite background color if event doesn't require personal
+            calendar_event["backgroundColor"] = "#404040"
 
         calendar_events.append(calendar_event)
 
