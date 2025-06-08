@@ -5,6 +5,7 @@ from streamlit_calendar import calendar
 from pandas import DataFrame
 
 
+@st.cache_data
 def get_calendar_events(events: DataFrame, config: dict) -> list[dict]:
     """
     Convert a pd.DataFrame with events to a list with calendar events

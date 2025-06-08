@@ -36,6 +36,7 @@ def update_event_table():
         st.rerun(scope="app")
 
 
+@st.cache_data
 def query_lock(parameter: str, value: str, error_message: str) -> None:
     """
     Disables the website if the URL query differs from the required one.
@@ -52,6 +53,7 @@ def query_lock(parameter: str, value: str, error_message: str) -> None:
         st.stop()
 
 
+@st.cache_data
 def show_locked_badge() -> None:
     """
     Shows a badge with "Locked" if "editable" is set to false in config
@@ -70,13 +72,14 @@ def show_calendar() -> dict:
     events = get_calendar_events(ss.event_table, ss.config)
     selection = calendar_ui(events, ss.config["calendarOptions"])
 
-    cal_capt_col1, _, cal_capt_col2 = st.columns([4, 1, 3])
+    cal_capt_col1, _, cal_capt_col2 = st.columns([3, 1, 3])
 
     with cal_capt_col1:
         st.caption("Click on an event to see details and available shifts")
 
     with cal_capt_col2:
-        st.caption("Red bordered events are tagged as NSFW")
+        st.caption("Gray colored events don't require technicians  \n"
+                   "Red bordered events are tagged as NSFW")
 
     return selection
 
@@ -90,6 +93,7 @@ def get_selected_event_series() -> tuple[pd.Series, int]:
     return ss.event_table.iloc[sel_event_index], sel_event_index
 
 
+@st.cache_data
 def show_event_header(event: pd.Series, short: bool = False) -> None:
     """
     Shows the header information about a given event
@@ -131,6 +135,7 @@ def show_event_header(event: pd.Series, short: bool = False) -> None:
         st.caption(f"by {event.host} ({formated_contact_info}) at {room_name}")
 
 
+@st.cache_data
 def show_timetable(event: pd.Series) -> None:
     """
     Shows timetable with setup, event start, event end and teardown end times
@@ -152,6 +157,7 @@ def show_timetable(event: pd.Series) -> None:
     st.dataframe(timetable, use_container_width=False, width=250)
 
 
+@st.cache_data
 def build_interactive_dataframe(event: pd.Series, event_index: int) -> pd.DataFrame:
     """
     Builds a pandas dataframe and streamlit columns config for use in a streamlit data editor
@@ -245,6 +251,7 @@ def show_interactive_position_selections_col(event: pd.Series, event_index: int)
         save_to_event_table(new_crew_positions, event_index)
 
 
+@st.cache_data
 def show_setup_info(event: pd.Series) -> None:
     """
     Shows setup relevant info of the event: Room Layout, Required Equipment, Private Equipment
@@ -293,7 +300,7 @@ def build_tags_string(event: pd.Series) -> str:
 
     return tags_text_body
 
-
+@st.cache_data
 def show_general_event_info(event: pd.Series) -> None:
     """
     Shows general info of the event: Technical Description, Abstract, Description, Tags
@@ -582,7 +589,7 @@ st.markdown('# <font color="#FFFFFF">Paw</font><font color="#d35365">Scheduler</
 show_locked_badge()
 
 # start periodic updates of event table
-#update_event_table()
+update_event_table()
 
 calendar_tab, open_shifts_tab, your_shifts_tab, all_data_tab = st.tabs(
     [
