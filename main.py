@@ -29,6 +29,7 @@ def update_event_table():
     if needs_update:
         # update event in sessionstate
         ss.event_table = new_event_table
+        print("B")
 
     if needs_rerun:
         # trigger rerun
@@ -151,42 +152,33 @@ def show_timetable(event: pd.Series) -> None:
     st.dataframe(timetable, use_container_width=False, width=250)
 
 
-def build_interactive_dataframe(event: pd.Series, event_index: int) -> tuple[pd.DataFrame, dict]:
+def build_interactive_dataframe(event: pd.Series, event_index: int) -> pd.DataFrame:
     """
     Builds a pandas dataframe and streamlit columns config for use in a streamlit data editor
     :param event: event as pd.Series
     :param event_index: event index in event table as int
-    :return: tuple of (pd.Dataframe with available positions and assigned crew members, column config dict)
+    :return: pd.Dataframe with available positions and assigned crew members
     """
     # build pd.Dataframe from positions and names
     positions = ss.config["available_positions"]  # required columns of event table
-    col_config = {}  # columns of dataframe
+    columns = []  # columns of dataframe
     assigned_crew_member = {}  # values of dataframe
     for position in positions:
-        # transfer crew shifts of this event from event table
-        assigned_crew_member[position] = event[position]
-        if event[position] == "-":
-            # position not required
-            col_config[position] = st.column_config.TextColumn(
-                position,
-                disabled=True
-            )
-        else:
+        if event[position] != "-":
+            # transfer crew shifts of this event from event table
+            assigned_crew_member[position] = event[position]
+
             # interactive dropdown menu
-            col_config[position] = st.column_config.SelectboxColumn(
-                position,
-                options=ss.config["crew_members"],  # list of crew members
-                disabled=not ss.config["editable"]  # locks table if set in config
-            )
+            columns.append(position)
 
     # build dataframe
     crew_positions = pd.DataFrame(
-        columns=positions,
+        columns=columns,
         data=assigned_crew_member,
         index=[event_index]
-    )
+    ).transpose().rename(columns={event_index: "Name"})
     
-    return crew_positions, col_config
+    return crew_positions
 
 
 def save_to_event_table(new_crew_positions: pd.DataFrame, event_index: int) -> None:
@@ -200,10 +192,10 @@ def save_to_event_table(new_crew_positions: pd.DataFrame, event_index: int) -> N
     update_event_table()
 
     # format positions as list
-    replacement_data = new_crew_positions.iloc[0].tolist()
+    replacement_data = new_crew_positions.transpose().iloc[0].tolist()
 
     # merge into event table
-    positions = ss.config["available_positions"]
+    positions = new_crew_positions.index
     ss.event_table.loc[event_index, positions] = replacement_data
 
     # save to file
@@ -219,22 +211,38 @@ def show_interactive_position_selections_col(event: pd.Series, event_index: int)
     :return: None
     """
     # build dataframe and column config
-    crew_positions, col_config = build_interactive_dataframe(event, event_index)
+    crew_positions = build_interactive_dataframe(event, event_index)
 
     show_locked_badge()
 
-    # show editable dataframe
-    new_crew_positions = st.data_editor(
-        crew_positions,
-        column_config=col_config,
-        hide_index=True
-    )
-    st.caption("Don't forget to scroll to the right or switch to fullscreen  \n"
-               " (:material/fullscreen: in top right corner of the table)")
-    st.caption('Click on _None_ or an already filled in name to edit it.')
+    if crew_positions.empty:
+        # no positions required
+        st.info("No positions required for this event")
 
-    # write to the event table and save as file
-    save_to_event_table(new_crew_positions, event_index)
+    else:
+        col_config = {
+            "Name": st.column_config.SelectboxColumn(
+                label="Name",
+                options=ss.config["crew_members"],
+                disabled=not ss.config["editable"]
+            ),
+            "": st.column_config.TextColumn(
+                label="",
+                disabled=True
+            )
+        }
+
+        # show editable dataframe
+        new_crew_positions = st.data_editor(
+            crew_positions,
+            column_config=col_config,
+            hide_index=False
+        )
+
+        st.caption('Click on _None_ or an already filled in name to edit it.')
+
+        # write to the event table and save as file
+        save_to_event_table(new_crew_positions, event_index)
 
 
 def show_setup_info(event: pd.Series) -> None:
@@ -394,15 +402,18 @@ def show_open_shifts_event_cell(event: pd.Series, show_open_positions: bool, exp
 
         with crew_position_col:
             # build pd.Dataframe from positions and names
-            positions = ss.config["available_positions"]  # required columns of event table
+            positions = np.array(ss.config["available_positions"])  # required columns of event table
             assigned_crew_member = []  # values of dataframe
+            indices = []
             for position in positions:
                 # transfer crew shifts of this event from event table
-                assigned_crew_member.append(event[position])
+                if event[position] != "-":
+                    assigned_crew_member.append(event[position])
+                    indices.append(position)
 
             # build dataframe
             crew_positions = pd.DataFrame(
-                index=positions,
+                index=indices,
                 data=assigned_crew_member,
                 columns=["Names"]
             )
@@ -567,10 +578,11 @@ st.logo("Logo-1-Color-B.png", size="large", link="https://awoostria.at/")
 # website title
 st.markdown('# <font color="#FFFFFF">Paw</font><font color="#d35365">Scheduler</font>', unsafe_allow_html=True)
 
+
 show_locked_badge()
 
 # start periodic updates of event table
-update_event_table()
+#update_event_table()
 
 calendar_tab, open_shifts_tab, your_shifts_tab, all_data_tab = st.tabs(
     [
